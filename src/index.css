@@ -1,6 +1,22 @@
 @import "tailwindcss";
 
 @theme {
- --color-green-light: oklch(62.7% .194 149.214);
- --color-bg-dark-blue: oklch(12.9% .042 264.695);
+  /* Background */
+  --color-bg-dark: #020617;
+  --color-input-bg: #111827;
+
+  /* Text */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #94a3b8;
+
+  /* Border */
+  --color-border: #334155;
+  --color-border-focus: #64748b;
+
+  /* Button */
+  --color-button-primary: #09ad43;
+  --color-button-hover: #08a33f;
+
+  /* Link */
+  --color-link: #00c853;
 }
