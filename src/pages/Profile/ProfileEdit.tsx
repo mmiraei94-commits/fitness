@@ -6,7 +6,7 @@ interface IProfileEdit {
 }
 
 const ProfileEdit = ({ onClose }: IProfileEdit) => {
-  const userData = useUserData();
+  const userData = useUserData();      
   const [formData, setFormData] = useState({
     age: userData.age ?? 0,
     weight: userData.weight ?? 0,

@@ -6,8 +6,7 @@ import {
   faEye,
   faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router";
-// import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -161,9 +160,9 @@ const SignIn = () => {
         {/* Sign Up */}
         <p className="text-center text-sm text-text-secondary mt-7">
           Don’t have an account?
-          {/* <Link to={"/"} className="text-link ml-1 hover:underline">
+          <Link to={"/signup"} className="text-link ml-1 hover:underline">
             Sign up
-          </Link> */}
+          </Link>
         </p>
       </div>
     </main>

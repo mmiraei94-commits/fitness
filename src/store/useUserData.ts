@@ -8,12 +8,16 @@ interface IUseUserData {
   weight: number | null;
   height: number | null;
   goal: TGoal;
+  email: string | null;
+  password: string | null;
   dailyCalorieIntake: number;
   dailyCaloriesBurn: number;
 
   setAge: (age: number | null) => void;
   setWeight: (weight: number | null) => void;
   setHeight: (height: number | null) => void;
+  setEmail: (email: string | null) => void;
+  setPassword: (password: string | null) => void;
   setGoal: (goal: TGoal) => void;
   setDailyCalorieIntake: (calories: number) => void;
   setDailyCaloriesBurn: (calories: number) => void;
@@ -25,6 +29,8 @@ export const useUserData = create<IUseUserData>()(
       age: null,
       weight: null,
       height: null,
+      email:"",
+      password:"",      
       goal: "maintain weight",
       dailyCalorieIntake: 0,
       dailyCaloriesBurn: 0,
@@ -32,6 +38,8 @@ export const useUserData = create<IUseUserData>()(
       setAge: (age) => set({ age }),
       setWeight: (weight) => set({ weight }),
       setHeight: (height) => set({ height }),
+      setEmail: (email) => set({ email }),
+      setPassword: (password) => set({ password}),
       setGoal: (goal) => set({ goal }),
       setDailyCalorieIntake: (value) => set({ dailyCalorieIntake: value }),
       setDailyCaloriesBurn: (value) => set({ dailyCaloriesBurn: value }),
