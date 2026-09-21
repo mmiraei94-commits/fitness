@@ -7,7 +7,7 @@ import { NavLink } from "react-router";
 
 const SidebarMenu = () => {
   return (
-    <nav className="hidden lg:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 p-6 transition-colors duration-200 h-screen">
+    <nav className="hidden fixed lg:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 p-6 transition-colors duration-200 min-h-screen">
       <div className="flex items-center gap-3 mb-8">
         <div className="size-10 rounded-xl bg-emerald-500 flex items-center justify-center">
           <svg
@@ -35,7 +35,7 @@ const SidebarMenu = () => {
       </div>
       <div className="flex flex-col gap-2">
         <NavLink
-          to={"/"}
+          to={"/home"}
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-2.5 border-l-3 transition-all duration-200 ${
               isActive

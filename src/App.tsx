@@ -5,16 +5,18 @@ import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
 import Food from "./pages/Food";
 import Activity from "./pages/Activity";
-import Profile from "./pages/Profile";
+import Profile from "./pages/Profile/Profile";
 import SignLayout from "./layouts/SignLayout";
 import Signup from "./pages/Signup";
+import GetUserData from "./pages/GetDataUser/GetDataUser";
+import GetUserDataLayout from "./layouts/GetUserDataLayout";
 
 const router = createBrowserRouter([
   {
     Component: MainLayout,
     children: [
       {
-        path: "/",
+        path: "/home",
         Component: Home,
       },
       {
@@ -35,12 +37,21 @@ const router = createBrowserRouter([
     Component: SignLayout,
     children: [
       {
-        path: "/signin",
+        path: "/",
         Component: Signin,
       },
       {
         path: "/signup",
         Component: Signup,
+      },
+    ],
+  },
+  {
+    Component: GetUserDataLayout,
+    children: [
+      {
+        path: "/getdata",
+        Component: GetUserData,
       },
     ],
   },
