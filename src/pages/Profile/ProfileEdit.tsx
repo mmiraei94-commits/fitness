@@ -1,49 +1,64 @@
 import { useState } from "react";
 import { useUserData } from "../../store/useUserData";
+import { useAuthStore } from "../../store/useAuthStore";
 
 interface IProfileEdit {
   onClose: () => void;
 }
 
 const ProfileEdit = ({ onClose }: IProfileEdit) => {
-  const userData = useUserData();      
+  const updateUserData = useUserData((state) => state.updateUserData);
+  const currentUser = useAuthStore((state) => state.currentUser); // فرض بر داشتنِ ایمیل از auth
+  const userData = useUserData((state) =>
+    currentUser ? state.userProfiles[currentUser.email] : null,
+  );
+
+  // ۳. حالا می‌توانید از userData استفاده کنید.
+  // نکته: چون ممکن است userData در لحظه اول null باشد، باید حتماً بررسی کنید:
   const [formData, setFormData] = useState({
-    age: userData.age ?? 0,
-    weight: userData.weight ?? 0,
-    height: userData.height ?? 0,
-    goal: userData.goal,
+    age: userData?.age ?? 0,
+    weight: userData?.weight ?? 0,
+    height: userData?.height ?? 0,
+    goal: userData?.goal ?? "maintain weight",
   });
 
-    const handleChange = (
-      e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    ) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({
-        ...prev,
-        [name]: name === "goal" ? value : Number(value),
-      }));
-    };
-
-  const handleSave = () => {
-    userData.setAge(formData.age);
-    userData.setWeight(formData.weight);
-    userData.setHeight(formData.height);
-    userData.setGoal(
-      formData.goal as "lose weight" | "maintain weight" | "gain muscle",
-    );
-    onClose();
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "goal" ? value : Number(value),
+    }));
   };
 
+  // ۲. متد handleSave جدید
+  const handleSave = () => {
+    if (currentUser) {
+      // ارسال ایمیل کاربر و آبجکتِ تغییرات
+      updateUserData(currentUser.email, {
+        age: formData.age,
+        weight: formData.weight,
+        height: formData.height,
+        goal: formData.goal as
+          | "lose weight"
+          | "maintain weight"
+          | "gain muscle",
+      });
+      onClose();
+    } else {
+      console.error("کاربر لاگین نیست!");
+    }
+  };
 
   return (
-    <div >
+    <div>
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-xl font-bold text-white">Edit Your Profile</h2>
         <button
           onClick={onClose}
           className="text-slate-500 hover:text-white transition-colors"
-        >
-        </button>
+        ></button>
       </div>
 
       <div className="space-y-5">
@@ -77,7 +92,6 @@ const ProfileEdit = ({ onClose }: IProfileEdit) => {
         {/* Goal Field */}
         <div className="space-y-2">
           <label className="text-sm text-slate-400 flex items-center gap-2">
-           
             Fitness Goal
           </label>
           <select
@@ -105,14 +119,12 @@ const ProfileEdit = ({ onClose }: IProfileEdit) => {
           onClick={handleSave}
           className="flex-1 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-2"
         >
-      
           Save Changes
         </button>
       </div>
     </div>
   );
 };
-
 
 interface FieldProps {
   label: string;
@@ -122,13 +134,7 @@ interface FieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const FormField = ({
-  label,
-  name,
-  type,
-  value,
-  onChange,
-}: FieldProps) => (
+const FormField = ({ label, name, type, value, onChange }: FieldProps) => (
   <div className="space-y-2">
     <label className="text-sm text-slate-400 flex items-center gap-2">
       {label}

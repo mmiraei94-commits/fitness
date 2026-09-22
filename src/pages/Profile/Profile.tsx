@@ -21,7 +21,7 @@ const Profile = () => {
   );
 
   return (
-    <section className="grow ml-64 h-screen">
+    <section className=" lg:ml-64 h-screen">
       <div className="min-h-screen">
         <div className="dark:bg-slate-900 p-6">
           <h1 className="font-bold text-white text-2xl">Profile</h1>

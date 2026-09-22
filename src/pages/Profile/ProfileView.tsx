@@ -1,12 +1,24 @@
+import { useAuthStore } from '../../store/useAuthStore';
 import { useUserData } from '../../store/useUserData';
 
-const ProfileView = ({onEdit}) => {
-    const age = useUserData((state) => state.age);
-    const weight = useUserData((state) => state.weight);
-    const height = useUserData((state) => state.height);
-    const goal = useUserData((state) => state.goal);
-    const dailyCalorieIntake = useUserData((state) => state.dailyCalorieIntake);
-    const dailyCaloriesBurn = useUserData((state) => state.dailyCaloriesBurn);
+const ProfileView = ({ onEdit }) => {
+  // ۱. گرفتن ایمیل کاربر لاگین شده
+  const currentUserEmail = useAuthStore((state) => state.currentUser?.email);
+
+  // ۲. گرفتن دیتای مخصوص همین کاربر (با استفاده از Selector)
+  const userData = useUserData((state) =>
+    currentUserEmail ? state.userProfiles[currentUserEmail] : null,
+  );
+
+  // ۳. مدیریت حالت "عدم وجود اطلاعات"
+  if (!userData) {
+    return (
+      <div className="flex items-center justify-center h-full p-8 text-gray-500">
+        <p>اطلاعات پروفایل یافت نشد. لطفاً ابتدا پروفایل خود را تکمیل کنید.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Age */}
@@ -35,7 +47,7 @@ const ProfileView = ({onEdit}) => {
         <div>
           <p className="text-sm text-slate-500">Age</p>
           <p className="font-semibold text-white">
-            {age !== null ? `${age} years` : "Not set"}
+            {userData.age !== null ? `${userData.age} years` : "Not set"}
           </p>
         </div>
       </div>
@@ -43,7 +55,6 @@ const ProfileView = ({onEdit}) => {
       {/* Weight */}
       <div className="bg-slate-800/50 rounded-xl px-4 py-4 flex items-center gap-4 border border-slate-800">
         <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-          
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -67,7 +78,7 @@ const ProfileView = ({onEdit}) => {
         <div>
           <p className="text-sm text-slate-500">Weight</p>
           <p className="font-semibold text-white">
-            {weight !== null ? `${weight} kg` : "Not set"}
+            {userData.weight !== null ? `${userData.weight} kg` : "Not set"}
           </p>
         </div>
       </div>
@@ -75,7 +86,6 @@ const ProfileView = ({onEdit}) => {
       {/* Height */}
       <div className="bg-slate-800/50 rounded-xl px-4 py-4 flex items-center gap-4 border border-slate-800">
         <div className="w-10 h-10 rounded-lg bg-teal-500/20 flex items-center justify-center">
-          
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -96,7 +106,7 @@ const ProfileView = ({onEdit}) => {
         <div>
           <p className="text-sm text-slate-500">Height</p>
           <p className="font-semibold text-white">
-            {height !== null ? `${height} cm` : "Not set"}
+            {userData.height !== null ? `${userData.height} cm` : "Not set"}
           </p>
         </div>
       </div>
@@ -126,7 +136,7 @@ const ProfileView = ({onEdit}) => {
         <div>
           <p className="text-sm text-slate-500">Goal</p>
           <p className="font-semibold text-white">
-            {goal || "maintain weight"}
+            {userData.goal || "maintain weight"}
           </p>
         </div>
       </div>
@@ -139,6 +149,6 @@ const ProfileView = ({onEdit}) => {
       </button>
     </div>
   );
-}
+};
 
 export default ProfileView

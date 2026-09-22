@@ -5,19 +5,54 @@ import {
   faLock,
   faEye,
   faEyeSlash,
+  faAt,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router";
-import { useUserData } from "../store/useUserData";
+import { useAuthStore } from "../store/useAuthStore";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const email = useUserData((state)=>state.email);
-  const password = useUserData((state) => state.password);
-  const setEmail = useUserData((state) => state.setEmail);
-  const setPassword = useUserData((state) => state.setPassword);
+  // ۱. تعریف Draft State (همه اطلاعات فرم اینجا جمع می‌شود)
+  const [draft, setDraft] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+  const signUp = useAuthStore((state) => state.signUp);
+
+  // تابع کمکی برای آپدیت راحت‌تر در Draft
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setDraft((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // ۲. اعتبارسنجی (Validation) روی داده‌های Draft
+    if (draft.username.length < 3) {
+      alert("نام کاربری خیلی کوتاه است");
+      return;
+    }
+    if (!draft.email.includes("@")) {
+      alert("ایمیل معتبر نیست");
+      return;
+    }
+
+    // ۳. انتقال نهایی (The Transfer):
+    // حالا داده‌ها از حالت محلی خارج شده و به استور جهانی (Zustand) ارسال می‌شوند
+    const isSuccess = signUp(draft.email, draft.password);
+    // نکته: اگر در استور خودتان فیلد username را هم اضافه کرده‌اید، باید آن را هم اینجا بفرستید:
+    // const isSuccess = signUp(draft.email, draft.password, draft.username);
+
+    if (isSuccess) {
+      navigate("/");
+    } else {
+      alert("خطا در ثبت‌نام.");
+    }
   };
 
   return (
@@ -32,7 +67,48 @@ const Signup = () => {
         <p className="text-text-secondary text-sm mb-6">
           Please enter your details to create an account.
         </p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSignUp}>
+          {/* Username */}
+          <div className="mb-5">
+            <label
+              htmlFor="username"
+              className="block text-text-primary text-sm font-medium mb-2"
+            >
+              Username
+            </label>
+
+            <div className="relative">
+              <FontAwesomeIcon
+                icon={faAt}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-sm"
+              />
+
+              <input
+                id="username"
+                name="username"
+                type="text"
+                value={draft.username}
+                onChange={handleChange}
+                placeholder="enter an username"
+                className="
+                w-full
+                h-[46px]
+                rounded-md
+                border
+                border-border
+                bg-input-bg
+                pl-10
+                pr-3
+                text-sm
+                text-text-primary
+                placeholder:text-text-secondary
+                outline-none
+                focus:border-border-focus
+                transition
+              "
+              />
+            </div>
+          </div>
           {/* Email */}
           <div className="mb-5">
             <label
@@ -50,9 +126,10 @@ const Signup = () => {
 
               <input
                 id="email"
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={draft.email}
+                onChange={handleChange}
                 placeholder="Please enter your email"
                 className="
                 w-full
@@ -91,9 +168,10 @@ const Signup = () => {
 
               <input
                 id="password"
+                name="password"
                 type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={draft.password}
+                onChange={handleChange}
                 placeholder="Please enter your password"
                 className="
                 w-full

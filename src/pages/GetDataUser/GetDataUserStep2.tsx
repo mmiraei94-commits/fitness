@@ -1,19 +1,52 @@
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useUserData } from "../../store/useUserData";
+import { useState } from "react";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const GetDataUserStep2 = ({ onBack, onNext }) => {
-  const weight = useUserData((state) => state.weight);
-  const setWeight = useUserData((state) => state.setWeight);
-  const height = useUserData((state) => state.height);
-  const setHeight= useUserData((state) => state.setHeight);
+ const updateUserData = useUserData((state) => state.updateUserData);
+  const currentUser = useAuthStore((state) => state.currentUser); // فرض بر داشتنِ ایمیل از auth
+  const userData = useUserData((state) =>
+    currentUser ? state.userProfiles[currentUser.email] : null,
+  );
 
-  const handleContinue = () => {
-    if (weight === null) {
-      return;
-    }
-    onNext();
+  const [formData, setFormData] = useState({
+    age: userData?.age ?? 0,
+    weight: userData?.weight ?? 0,
+    height: userData?.height ?? 0,
+    goal: userData?.goal ?? "maintain weight",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "goal" ? value : Number(value),
+    }));
   };
+
+  // ۲. متد handleSave جدید
+  const handleContinue = () => {
+    if (currentUser) {
+      // ارسال ایمیل کاربر و آبجکتِ تغییرات
+      updateUserData(currentUser.email, {
+        age: formData.age,
+        weight: formData.weight,
+        height: formData.height,
+        goal: formData.goal as
+          | "lose weight"
+          | "maintain weight"
+          | "gain muscle",
+      });
+      onNext();
+    } else {
+      console.error("کاربر لاگین نیست!");
+    }
+  };
+
   return (
     <main>
       {/* Question */}
@@ -42,28 +75,16 @@ const GetDataUserStep2 = ({ onBack, onNext }) => {
 
         <input
           id="weight"
+          name="weight"
           min="1"
           type="number"
-          value={weight ?? ""}
+          value={formData.weight ?? ""}
           onKeyDown={(e) => {
             if (e.key === "-") {
               e.preventDefault();
             }
           }}
-          onChange={(e) => {
-            const value = e.target.value;
-
-            if (value === "") {
-              setWeight(null);
-              return;
-            }
-
-            if (Number(value) < 0) {
-              return;
-            }
-
-            setWeight(Number(value));
-          }}
+          onChange={handleChange}
           className="
               h-[29px]
               w-full
@@ -90,28 +111,16 @@ const GetDataUserStep2 = ({ onBack, onNext }) => {
 
         <input
           id="height"
+          name="height"
           type="number"
           min="1"
-          value={height ?? ""}
+          value={formData.height ?? ""}
           onKeyDown={(e) => {
             if (e.key === "-") {
               e.preventDefault();
             }
           }}
-          onChange={(e) => {
-            const value = e.target.value;
-
-            if (value === "") {
-              setHeight(null);
-              return;
-            }
-
-            if (Number(value) < 0) {
-              return;
-            }
-
-            setHeight(Number(value));
-          }}
+          onChange={handleChange}
           className="
               h-[29px]
               w-full

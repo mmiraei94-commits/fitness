@@ -1,17 +1,54 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight} from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useUserData } from "../../store/useUserData";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useState } from "react";
 
 const GetDataUserStep1 = ({ onNext }) => {
-  const age = useUserData((state) => state.age);
-  const setAge = useUserData((state) => state.setAge);
+  const updateUserData = useUserData((state) => state.updateUserData);
+  const currentUser = useAuthStore((state) => state.currentUser); // فرض بر داشتنِ ایمیل از auth
+  const userData = useUserData((state) =>
+    currentUser ? state.userProfiles[currentUser.email] : null,
+  );
 
-  const handleContinue = () => {
-    if (age === null) {
-      return;
-    }
-    onNext();
+  const [formData, setFormData] = useState({
+    age: userData?.age ?? 0,
+    weight: userData?.weight ?? 0,
+    height: userData?.height ?? 0,
+    goal: userData?.goal ?? "maintain weight",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "goal" ? value : Number(value),
+    }));
   };
+
+  // ۲. متد handleSave جدید
+  const handleContinue = () => {
+    if (currentUser) {
+      // ارسال ایمیل کاربر و آبجکتِ تغییرات
+      updateUserData(currentUser.email, {
+        age: formData.age,
+        weight: formData.weight,
+        height: formData.height,
+        goal: formData.goal as
+          | "lose weight"
+          | "maintain weight"
+          | "gain muscle",
+      });
+      onNext();
+    } else {
+      console.error("کاربر لاگین نیست!");
+    }
+  };
+  // if (age === null) {
+  //   return;
+  // }
 
   return (
     <main>
@@ -38,11 +75,10 @@ const GetDataUserStep1 = ({ onNext }) => {
 
         <input
           id="age"
+          name="age"
           type="number"
-          value={age ?? ""}
-          onChange={(e) => {
-            setAge(e.target.value === "" ? null : Number(e.target.value));
-          }}
+          value={formData.age ?? ""}
+          onChange={handleChange}
           className="
               h-[29px]
               w-full

@@ -4,7 +4,7 @@ import BottomMenu from "../components/BottomMenu";
 
 const MainLayout = () => {
   return (
-    <section className="flex">
+    <section className="">
       <SidebarMenu/>
       <BottomMenu/>
       <Outlet />

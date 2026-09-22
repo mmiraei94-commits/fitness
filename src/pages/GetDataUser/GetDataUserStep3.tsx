@@ -1,18 +1,59 @@
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useUserData } from "../../store/useUserData";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useState } from "react";
 
 const GetDataUserStep3 = ({ onBack, onNext }) => {
-  const goal = useUserData((state) => state.goal);
-  const setGoal = useUserData((state) => state.setGoal);
-  const dailyCalorieIntake = useUserData((state) => state.dailyCalorieIntake);
-  const setDailyCalorieIntake = useUserData(
-    (state) => state.setDailyCalorieIntake,
-  );
-  const dailyCaloriesBurn = useUserData((state) => state.dailyCaloriesBurn);
-  const setDailyCaloriesBurn = useUserData(
-    (state) => state.setDailyCaloriesBurn,
-  );
+  const updateUserData = useUserData((state) => state.updateUserData);
+   const currentUser = useAuthStore((state) => state.currentUser); // فرض بر داشتنِ ایمیل از auth
+   const userData = useUserData((state) =>
+     currentUser ? state.userProfiles[currentUser.email] : null,
+   );
+ 
+   const [formData, setFormData] = useState({
+     age: userData?.age ?? 0,
+     weight: userData?.weight ?? 0,
+     height: userData?.height ?? 0,
+     goal: userData?.goal ?? "maintain weight",
+     dailyCalorieIntake: userData?.dailyCalorieIntake ?? 0,
+     dailyCaloriesBurn: userData?.dailyCaloriesBurn ?? 0,
+   });
+ 
+   const handleChange = (
+     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+   ) => {
+     const { name, value } = e.target;
+     setFormData((prev) => ({
+       ...prev,
+       [name]: name === "goal" ? value : Number(value),
+     }));
+   };
+
+const handleGoalSelect = (goalValue: string) => {
+  setFormData((prev) => ({ ...prev, goal: goalValue as any }));
+};
+ 
+   // ۲. متد handleSave جدید
+   const handleContinue = () => {
+     if (currentUser) {
+       // ارسال ایمیل کاربر و آبجکتِ تغییرات
+       updateUserData(currentUser.email, {
+         age: formData.age,
+         weight: formData.weight,
+         height: formData.height,
+         goal: formData.goal as
+           | "lose weight"
+           | "maintain weight"
+           | "gain muscle",
+         dailyCalorieIntake: formData.dailyCalorieIntake,
+         dailyCaloriesBurn: formData.dailyCaloriesBurn,
+       });
+       onNext();
+     } else {
+       console.error("کاربر لاگین نیست!");
+     }
+   };
 
     const goals = [
       {
@@ -52,11 +93,12 @@ const GetDataUserStep3 = ({ onBack, onNext }) => {
           <button
             key={item.value}
             type="button"
-            onClick={() => setGoal(item.value)}
+            name="goal"
+            onClick={()=>handleGoalSelect(item.value)}
             className={`w-full rounded-xl border px-5 py-2 text-left
               text-sm transition-all duration-200
               ${
-                goal === item.value
+                formData.goal === item.value
                   ? "border-[#00d9a5] shadow-[0_0_0_1px_#00d9a5]"
                   : "border-[#344258]"
               }
@@ -86,17 +128,18 @@ const GetDataUserStep3 = ({ onBack, onNext }) => {
           </div>
 
           <span className="text-sm font-semibold text-[#00d9a5]">
-            {dailyCalorieIntake} kcal
+            {formData.dailyCalorieIntake} kcal
           </span>
         </div>
 
         <input
           type="range"
+          name="dailyCalorieIntake"
           min="1000"
           max="4000"
           step="50"
-          value={dailyCalorieIntake}
-          onChange={(e) => setDailyCalorieIntake(Number(e.target.value))}
+          value={formData.dailyCalorieIntake}
+          onChange={handleChange}
           className="h-2 w-full cursor-pointer rounded-full
             bg-[#344258]
             accent-[#00d9a5]"
@@ -114,18 +157,17 @@ const GetDataUserStep3 = ({ onBack, onNext }) => {
             </span>
           </div>
 
-          <span className="text-sm font-semibold text-[#00d9a5]">
-            {dailyCaloriesBurn} kcal
-          </span>
+          <span className="text-sm font-semibold text-[#00d9a5]">{} kcal</span>
         </div>
 
         <input
           type="range"
+          name="dailyCaloriesBurn"
           min="0"
           max="2000"
           step="50"
-          value={dailyCaloriesBurn}
-          onChange={(e) => setDailyCaloriesBurn(Number(e.target.value))}
+          value={formData.dailyCaloriesBurn}
+          onChange={handleChange}
           className="h-2 w-full cursor-pointer rounded-full
             bg-[#344258]
             accent-[#00d9a5]"
@@ -135,6 +177,7 @@ const GetDataUserStep3 = ({ onBack, onNext }) => {
       {/* Continue */}
       <button
         type="button"
+        onClick={handleContinue}
         className="
           fixed
           bottom-10

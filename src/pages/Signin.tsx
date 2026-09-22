@@ -7,20 +7,46 @@ import {
   faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router";
+import { useAuthStore } from "../store/useAuthStore";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // ۱. ایجاد Draft State برای اطلاعات ورود
+  const [draft, setDraft] = useState({
+    email: "",
+    password: "",
+  });
+
+  // ۲. دریافت توابع مورد نیاز از استور (با استفاده از Selector)
+  const signIn = useAuthStore((state) => state.signIn);
+  const currentUser = useAuthStore((state) => state.currentUser);
+
+  // تابع مدیریت تغییرات اینپوت‌ها
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setDraft((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (email === "admin@gmail.com" && password === "1234") {
-      navigate("/home");
+    // ۳. اعتبار سنجی اولیه (Validation)
+    if (!draft.email || !draft.password) {
+      alert("لطفاً همه فیلدها را پر کنید");
+      return;
+    }
+
+    // ۴. تلاش برای ورود از طریق استور
+    const isSuccess = signIn(draft.email, draft.password);
+
+    if (isSuccess) {
+      alert("خوش آمدید!");
+      navigate("/home"); // هدایت به صفحه اصلی بعد از ورود موفق
     } else {
-      alert("Email or password is incorrect");
+      alert("ایمیل یا پسورد اشتباه است.");
     }
   };
 
@@ -36,7 +62,7 @@ const SignIn = () => {
         <p className="text-text-secondary text-sm mb-6">
           Please enter email and password to access.
         </p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSignIn}>
           {/* Email */}
           <div className="mb-5">
             <label
@@ -54,9 +80,10 @@ const SignIn = () => {
 
               <input
                 id="email"
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={draft.email}
+                onChange={handleChange}
                 placeholder="Please enter your email"
                 className="
                 w-full
@@ -95,9 +122,10 @@ const SignIn = () => {
 
               <input
                 id="password"
+                name="password"
                 type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={draft.password}
+                onChange={handleChange}
                 placeholder="Please enter your password"
                 className="
                 w-full
@@ -165,8 +193,13 @@ const SignIn = () => {
           </Link>
         </p>
       </div>
+      {currentUser && (
+        <div className="mt-4 p-2 bg-green-50 text-green-700 text-xs rounded text-center">
+          وضعیت: کاربر {currentUser.email} لاگین است.
+        </div>
+      )}
     </main>
   );
-};
+};;
 
 export default SignIn;
