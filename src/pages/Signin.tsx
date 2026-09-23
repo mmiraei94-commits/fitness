@@ -193,11 +193,7 @@ const SignIn = () => {
           </Link>
         </p>
       </div>
-      {currentUser && (
-        <div className="mt-4 p-2 bg-green-50 text-green-700 text-xs rounded text-center">
-          وضعیت: کاربر {currentUser.email} لاگین است.
-        </div>
-      )}
+
     </main>
   );
 };;

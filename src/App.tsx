@@ -37,7 +37,7 @@ const router = createBrowserRouter([
     Component: SignLayout,
     children: [
       {
-        path: "/",
+        path: "/signin",
         Component: Signin,
       },
       {

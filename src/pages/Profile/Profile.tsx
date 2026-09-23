@@ -4,21 +4,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import ProfileEdit from "./ProfileEdit";
 import ProfileView from "./ProfileView";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useNavigate } from "react-router";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
 
-  // Selectorهای متدهای set جهت اعمال ویرایش
-  const setAge = useUserData((state) => state.setAge);
-  const setWeight = useUserData((state) => state.setWeight);
-  const setHeight = useUserData((state) => state.setHeight);
-  const setGoal = useUserData((state) => state.setGoal);
-  const setDailyCalorieIntake = useUserData(
-    (state) => state.setDailyCalorieIntake,
-  );
-  const setDailyCaloriesBurn = useUserData(
-    (state) => state.setDailyCaloriesBurn,
-  );
+    const handleLogout = () => {
+      logout();
+      navigate("/signin");
+    };
 
   return (
     <section className=" lg:ml-64 h-screen">
@@ -49,9 +46,8 @@ const Profile = () => {
               {isEditing ? (
                 <ProfileEdit onClose={() => setIsEditing(false)} />
               ) : (
-                <ProfileView onEdit={()=> setIsEditing(true)} />
+                <ProfileView onEdit={() => setIsEditing(true)} />
               )}
-
             </div>
 
             {/* بخش آمار و خروج (سمت راست) */}
@@ -84,10 +80,7 @@ const Profile = () => {
               {/* دکمه خروج */}
               <button
                 type="button"
-                onClick={() => {
-                
-                  console.log("Logged out!");
-                }}
+                onClick={handleLogout}
                 className="py-3.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/50 text-rose-400 border border-rose-900/40 font-semibold transition-colors flex items-center justify-center gap-2"
               >
                 <span>Logout</span>

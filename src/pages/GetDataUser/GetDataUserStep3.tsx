@@ -3,72 +3,75 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useUserData } from "../../store/useUserData";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const GetDataUserStep3 = ({ onBack, onNext }) => {
+  const navigate = useNavigate();
   const updateUserData = useUserData((state) => state.updateUserData);
-   const currentUser = useAuthStore((state) => state.currentUser); // فرض بر داشتنِ ایمیل از auth
-   const userData = useUserData((state) =>
-     currentUser ? state.userProfiles[currentUser.email] : null,
-   );
- 
-   const [formData, setFormData] = useState({
-     age: userData?.age ?? 0,
-     weight: userData?.weight ?? 0,
-     height: userData?.height ?? 0,
-     goal: userData?.goal ?? "maintain weight",
-     dailyCalorieIntake: userData?.dailyCalorieIntake ?? 0,
-     dailyCaloriesBurn: userData?.dailyCaloriesBurn ?? 0,
-   });
- 
-   const handleChange = (
-     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-   ) => {
-     const { name, value } = e.target;
-     setFormData((prev) => ({
-       ...prev,
-       [name]: name === "goal" ? value : Number(value),
-     }));
-   };
+  const currentUser = useAuthStore((state) => state.currentUser); // فرض بر داشتنِ ایمیل از auth
+  const userData = useUserData((state) =>
+    currentUser ? state.userProfiles[currentUser.email] : null,
+  );
 
-const handleGoalSelect = (goalValue: string) => {
-  setFormData((prev) => ({ ...prev, goal: goalValue as any }));
-};
- 
-   // ۲. متد handleSave جدید
-   const handleContinue = () => {
-     if (currentUser) {
-       // ارسال ایمیل کاربر و آبجکتِ تغییرات
-       updateUserData(currentUser.email, {
-         age: formData.age,
-         weight: formData.weight,
-         height: formData.height,
-         goal: formData.goal as
-           | "lose weight"
-           | "maintain weight"
-           | "gain muscle",
-         dailyCalorieIntake: formData.dailyCalorieIntake,
-         dailyCaloriesBurn: formData.dailyCaloriesBurn,
-       });
-       onNext();
-     } else {
-       console.error("کاربر لاگین نیست!");
-     }
-   };
+  const [formData, setFormData] = useState({
+    age: userData?.age ?? 0,
+    weight: userData?.weight ?? 0,
+    height: userData?.height ?? 0,
+    goal: userData?.goal ?? "maintain weight",
+    dailyCalorieIntake: userData?.dailyCalorieIntake ?? 0,
+    dailyCaloriesBurn: userData?.dailyCaloriesBurn ?? 0,
+  });
 
-    const goals = [
-      {
-        value: "lose weight",
-        label: "Lose Weight",
-      },
-      {
-        value: "maintain weight",
-        label: "Maintain Weight",
-      },
-      {
-        value: "gain muscle",
-        label: "Gain Muscle",
-      },
-    ] as const;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "goal" ? value : Number(value),
+    }));
+  };
+
+  const handleGoalSelect = (goalValue: string) => {
+    setFormData((prev) => ({ ...prev, goal: goalValue as any }));
+  };
+
+  // ۲. متد handleSave جدید
+  const handleContinue = () => {
+    if (currentUser) {
+      // ارسال ایمیل کاربر و آبجکتِ تغییرات
+      updateUserData(currentUser.email, {
+        age: formData.age,
+        weight: formData.weight,
+        height: formData.height,
+        goal: formData.goal as
+          | "lose weight"
+          | "maintain weight"
+          | "gain muscle",
+        dailyCalorieIntake: formData.dailyCalorieIntake,
+        dailyCaloriesBurn: formData.dailyCaloriesBurn,
+      });
+
+      navigate("/home")
+    } else {
+      console.error("کاربر لاگین نیست!");
+    }
+  };
+
+  const goals = [
+    {
+      value: "lose weight",
+      label: "Lose Weight",
+    },
+    {
+      value: "maintain weight",
+      label: "Maintain Weight",
+    },
+    {
+      value: "gain muscle",
+      label: "Gain Muscle",
+    },
+  ] as const;
 
   return (
     <main>
@@ -94,7 +97,7 @@ const handleGoalSelect = (goalValue: string) => {
             key={item.value}
             type="button"
             name="goal"
-            onClick={()=>handleGoalSelect(item.value)}
+            onClick={() => handleGoalSelect(item.value)}
             className={`w-full rounded-xl border px-5 py-2 text-left
               text-sm transition-all duration-200
               ${
@@ -231,4 +234,3 @@ const handleGoalSelect = (goalValue: string) => {
 };
 
 export default GetDataUserStep3;
-

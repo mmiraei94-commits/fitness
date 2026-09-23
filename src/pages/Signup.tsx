@@ -42,14 +42,11 @@ const Signup = () => {
       return;
     }
 
-    // ۳. انتقال نهایی (The Transfer):
-    // حالا داده‌ها از حالت محلی خارج شده و به استور جهانی (Zustand) ارسال می‌شوند
-    const isSuccess = signUp(draft.email, draft.password);
-    // نکته: اگر در استور خودتان فیلد username را هم اضافه کرده‌اید، باید آن را هم اینجا بفرستید:
-    // const isSuccess = signUp(draft.email, draft.password, draft.username);
+    const isSuccess = signUp(draft.email, draft.password, draft.username);
+
 
     if (isSuccess) {
-      navigate("/");
+      navigate("/getdata");
     } else {
       alert("خطا در ثبت‌نام.");
     }
@@ -234,7 +231,7 @@ const Signup = () => {
         {/* Login */}
         <p className="text-center text-sm text-text-secondary mt-7">
           Already Have an account?
-          <Link to={"/"} className="text-link ml-1 hover:underline">
+          <Link to={"/signin"} className="text-link ml-1 hover:underline">
             Login
           </Link>
         </p>

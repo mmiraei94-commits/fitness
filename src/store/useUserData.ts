@@ -8,6 +8,7 @@ interface IUserData {
   age: number | null;
   weight: number | null;
   height: number | null;
+  userName: string | null;
   goal: TGoal;
   dailyCalorieIntake: number;
   dailyCaloriesBurn: number;
@@ -22,6 +23,7 @@ interface IUserStore {
   setAge: (email: string, age: number | null) => void;
   setWeight: (email: string, weight: number | null) => void;
   setHeight: (email: string, height: number | null) => void;
+  setUserName: (email: string, userName: string | null) => void;
   setGoal: (email: string, goal: TGoal) => void;
   setDailyCalorieIntake: (email: string, calories: number) => void;
   setDailyCaloriesBurn: (email: string, calories: number) => void;
@@ -34,6 +36,7 @@ const defaultUserData: IUserData = {
   age: null,
   weight: null,
   height: null,
+  userName:null,
   goal: "maintain weight",
   dailyCalorieIntake: 0,
   dailyCaloriesBurn: 0,
@@ -71,6 +74,17 @@ export const useUserData = create<IUserStore>()(
             [email]: {
               ...(state.userProfiles[email] || defaultUserData),
               height,
+            },
+          },
+        })),
+
+      setUserName: (email, userName) =>
+        set((state) => ({
+          userProfiles: {
+            ...state.userProfiles,
+            [email]: {
+              ...(state.userProfiles[email] || defaultUserData),
+              userName,
             },
           },
         })),

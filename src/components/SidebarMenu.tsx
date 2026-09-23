@@ -4,8 +4,12 @@ import { faHome } from "@fortawesome/free-solid-svg-icons/faHome";
 import { faUser } from "@fortawesome/free-solid-svg-icons/faUser";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink } from "react-router";
+import { useAuthStore } from "../store/useAuthStore";
+import { useUserData } from "../store/useUserData";
 
 const SidebarMenu = () => {
+    const currentUserUserName = useAuthStore((state) => state.currentUser?.userName);
+
   return (
     <nav className="hidden fixed lg:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 p-6 transition-colors duration-200 min-h-screen">
       <div className="flex items-center gap-3 mb-8">
@@ -86,6 +90,10 @@ const SidebarMenu = () => {
           <FontAwesomeIcon icon={faUser} />
           Profile
         </NavLink>
+        <div className="flex items-center gap-3 px-4 py-2.5 text-white font-bold ">
+          <img className="bg-green-300 rounded-full size-9" src="public/Profile user.png" alt="" />
+          <p>{currentUserUserName}</p>
+        </div>
       </div>
     </nav>
   );

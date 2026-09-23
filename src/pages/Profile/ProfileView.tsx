@@ -9,6 +9,7 @@ const ProfileView = ({ onEdit }) => {
   const userData = useUserData((state) =>
     currentUserEmail ? state.userProfiles[currentUserEmail] : null,
   );
+  
 
   // ۳. مدیریت حالت "عدم وجود اطلاعات"
   if (!userData) {
